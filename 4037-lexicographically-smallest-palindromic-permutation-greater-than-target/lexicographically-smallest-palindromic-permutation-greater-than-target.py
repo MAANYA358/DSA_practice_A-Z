@@ -5,7 +5,7 @@ class Solution:
         n = len(s)
         total_cnt = Counter(s)
         
-        # 1. Validate palindrome feasibility
+        # 1. Palindrome feasibility check
         odd_chars = [ch for ch, cnt in total_cnt.items() if cnt % 2 != 0]
         if len(odd_chars) > 1 or (n % 2 == 0 and len(odd_chars) > 0):
             return ""
@@ -16,7 +16,6 @@ class Solution:
         
         candidates = []
         
-        # Helper: assemble full palindrome from first half
         def make_palindrome(first_half: str) -> str:
             return first_half + mid_char + first_half[::-1]
 
@@ -36,7 +35,6 @@ class Solution:
                 candidates.append(pal)
                 
         # 3. Find candidate by placing a strictly larger character in the first half
-        # Track maximum valid prefix length that can match target[:m]
         curr_prefix = Counter()
         max_pref = 0
         for ch in target[:m]:
@@ -48,17 +46,15 @@ class Solution:
                 
         for i in range(max_pref, -1, -1):
             if i < m:
-                # Remaining characters available to build the first half
                 rem_cnt = Counter(half_cnt) - curr_prefix
                 target_char = target[i]
                 
-                # Try the smallest character strictly greater than target[i]
+                # Pick the smallest available character strictly greater than target[i]
                 for code in range(ord(target_char) + 1, ord('z') + 1):
                     ch = chr(code)
                     if rem_cnt[ch] > 0:
                         rem_cnt[ch] -= 1
                         
-                        # Fill rest of first half greedily with smallest available characters
                         suffix = []
                         for code_c in range(ord('a'), ord('z') + 1):
                             c_char = chr(code_c)
@@ -68,7 +64,7 @@ class Solution:
                         first_half = target[:i] + ch + "".join(suffix)
                         candidates.append(make_palindrome(first_half))
                         rem_cnt[ch] += 1
-                        break  # Only the smallest valid ch at index i is optimal
+                        break
                         
             if i > 0:
                 curr_prefix[target[i - 1]] -= 1
